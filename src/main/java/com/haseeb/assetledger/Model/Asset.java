@@ -4,29 +4,39 @@ package com.haseeb.assetledger.Model;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 public class Asset {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
+    private String assetName;
     @Enumerated(EnumType.STRING)
-    private AssetType type;
+    private AssetType assetType;
+    private BigDecimal investedAmount;
+    private BigDecimal quantity;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    private BigDecimal amount;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Asset() {
     }
 
-    public Asset(Long id, String name, AssetType type, BigDecimal amount) {
+    public Asset(Long id, String assetName, AssetType assetType, BigDecimal investedAmount, BigDecimal quantity, LocalDateTime createdAt, LocalDateTime updatedAt, User user) {
         this.id = id;
-        this.name = name;
-        this.type = type;
-        this.amount = amount;
+        this.assetName = assetName;
+        this.assetType = assetType;
+        this.investedAmount = investedAmount;
+        this.quantity = quantity;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.user = user;
     }
 
     public Long getId() {
@@ -37,37 +47,73 @@ public class Asset {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getAssetName() {
+        return assetName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
     }
 
-    public AssetType getType() {
-        return type;
+    public AssetType getAssetType() {
+        return assetType;
     }
 
-    public void setType(AssetType type) {
-        this.type = type;
+    public void setAssetType(AssetType assetType) {
+        this.assetType = assetType;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
+    public BigDecimal getInvestedAmount() {
+        return investedAmount;
     }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
+    public void setInvestedAmount(BigDecimal investedAmount) {
+        this.investedAmount = investedAmount;
+    }
+
+    public BigDecimal getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(BigDecimal quantity) {
+        this.quantity = quantity;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
     public String toString() {
         return "Asset{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
-                ", type=" + type +
-                ", amount=" + amount +
+                ", assetName='" + assetName + '\'' +
+                ", assetType=" + assetType +
+                ", investedAmount=" + investedAmount +
+                ", quantity=" + quantity +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", user=" + user +
                 '}';
     }
 }
