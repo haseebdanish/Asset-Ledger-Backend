@@ -2,6 +2,10 @@ package com.haseeb.assetledger.Model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,11 +16,15 @@ public class Asset {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @NotBlank
     private String assetName;
     @Enumerated(EnumType.STRING)
     private AssetType assetType;
+    @NotNull
+    @Positive
     private BigDecimal investedAmount;
+    @NotNull
+    @Positive
     private BigDecimal quantity;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

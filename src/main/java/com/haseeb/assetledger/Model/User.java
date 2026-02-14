@@ -1,6 +1,8 @@
 package com.haseeb.assetledger.Model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDateTime;
 
@@ -11,9 +13,12 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
-
+    @NotBlank
     private String userName;
+    @Email
+    @NotBlank
     private String email;
+    @NotBlank
     private String password;
     private LocalDateTime createdAt;
 

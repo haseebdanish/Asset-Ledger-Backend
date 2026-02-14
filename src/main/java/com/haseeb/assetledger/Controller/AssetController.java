@@ -1,7 +1,10 @@
 package com.haseeb.assetledger.Controller;
 
+import com.haseeb.assetledger.Dto.AssetRequestDto;
+import com.haseeb.assetledger.Dto.AssetResponseDto;
 import com.haseeb.assetledger.Model.Asset;
 import com.haseeb.assetledger.Service.AssetService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,20 +23,18 @@ public class AssetController {
 
 
     @PostMapping("/{userid}/assets")
-    public ResponseEntity<Asset> addOrUpdateAsset(
+    public ResponseEntity<AssetResponseDto> addOrUpdateAsset(
             @PathVariable Long userid,
-            @RequestBody Asset asset
+            @Valid @RequestBody AssetRequestDto request
             ) {
-        Asset savedAsset = assetService.addOrUpdateAsset(userid, asset);
-        return ResponseEntity.ok(savedAsset);
+        return ResponseEntity.ok(assetService.addOrUpdateAsset(userid, request));
     }
 
     @GetMapping("/{userid}/assets")
-    public ResponseEntity<List<Asset>> getUserAssets(
+    public ResponseEntity<List<AssetResponseDto>> getUserAssets(
             @PathVariable Long userid
     ) {
-        List<Asset> assets = assetService.getUserAssets(userid);
-        return ResponseEntity.ok(assets);
+        return ResponseEntity.ok(assetService.getUserAssets(userid));
     }
 
     @GetMapping("/{userid}/networth")

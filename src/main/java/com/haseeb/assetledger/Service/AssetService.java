@@ -1,5 +1,7 @@
 package com.haseeb.assetledger.Service;
 
+import com.haseeb.assetledger.Dto.AssetRequestDto;
+import com.haseeb.assetledger.Dto.AssetResponseDto;
 import com.haseeb.assetledger.Model.Asset;
 import com.haseeb.assetledger.Model.User;
 import com.haseeb.assetledger.Repository.AssetRepository;
@@ -21,39 +23,53 @@ public class AssetService {
         this.userRepository = userRepository;
     }
 
-    public Asset addOrUpdateAsset(Long userId, Asset requestAsset) {
+    public AssetResponseDto addOrUpdateAsset(Long userId, AssetRequestDto request) {
 
         //1:Check if user exists
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         //2:Check if user Already has that same asset
-        return assetRepository
-                .findByUserAndAssetName(user, requestAsset.getAssetName())
+        Asset asset = assetRepository
+                .findByUserAndAssetName(user, request.assetName())
                 .map(existingAsset -> {
                     //3: If exists update Value
                     existingAsset.setQuantity(
-                            existingAsset.getQuantity().add(requestAsset.getQuantity())
+                            existingAsset.getQuantity().add(request.quantity())
                     );
 
                     existingAsset.setInvestedAmount(
-                            existingAsset.getInvestedAmount().add(requestAsset.getInvestedAmount())
+                            existingAsset.getInvestedAmount().add(request.investedAmount())
                     );
 
                     existingAsset.setUpdatedAt(LocalDateTime.now());
 
-                    return assetRepository.save(existingAsset);
+                    return existingAsset;
 
                 })
                 .orElseGet(() -> {
                     //If no asset is there create new asset
-                    requestAsset.setUser(user);
-                    requestAsset.setCreatedAt(LocalDateTime.now());
-                    requestAsset.setUpdatedAt(LocalDateTime.now());
+                    Asset newAsset = new Asset();
+                    newAsset.setUser(user);
+                    newAsset.setAssetName(request.assetName());
+                    newAsset.setAssetType(request.assetType());
+                    newAsset.setQuantity(request.quantity());
+                    newAsset.setInvestedAmount(request.investedAmount());
+                    newAsset.setCreatedAt(LocalDateTime.now());
+                    newAsset.setUpdatedAt(LocalDateTime.now());
 
-                    return assetRepository.save(requestAsset);
+                    return newAsset;
 
                 });
+        Asset saved = assetRepository.save(asset);
+
+        return new AssetResponseDto(
+                saved.getId(),
+                saved.getAssetName(),
+                saved.getAssetType(),
+                saved.getQuantity(),
+                saved.getInvestedAmount()
+        );
     }
 
     public BigDecimal getNetworth(Long userId) {
@@ -63,11 +79,21 @@ public class AssetService {
         return assetRepository.getTotalInvestedByUser(user);
     }
 
-    public List<Asset> getUserAssets(Long userId){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not Found"));
+    public List<AssetResponseDto> getUserAssets(Long userId) {
 
-        return assetRepository.findByUser(user);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return assetRepository.findByUser(user)
+                .stream()
+                .map(asset -> new AssetResponseDto(
+                        asset.getId(),
+                        asset.getAssetName(),
+                        asset.getAssetType(),
+                        asset.getQuantity(),
+                        asset.getInvestedAmount()
+                ))
+                .toList();
     }
 
 }
