@@ -6,6 +6,14 @@ public enum AssetType {
     BANK,
     CRYPTO,
     GOLD,
-    REAL_ESTATE
+    REAL_ESTATE;
+
+    public static AssetType fromString(String value){
+        return AssetType.valueOf(
+                value.trim()
+                        .toUpperCase()
+                        .replace('_',' ')
+        );
+    }
 }
 
