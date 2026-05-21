@@ -44,5 +44,4 @@ public class AssetController {
         BigDecimal networth = assetService.getNetworth(userid);
         return ResponseEntity.ok(networth);
     }
-
 }
