@@ -15,6 +15,7 @@ import java.util.List;
 @Service
 public class AssetService {
 
+    
     private AssetRepository assetRepository;
     private UserRepository userRepository;
 
