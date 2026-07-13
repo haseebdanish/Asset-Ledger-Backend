@@ -1,7 +1,12 @@
 package com.haseeb.assetledger.Dto;
 
-public record LoginResponseDto(
-        String token
-) {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class LoginResponseDto {
+
+    private String token;
 
 }

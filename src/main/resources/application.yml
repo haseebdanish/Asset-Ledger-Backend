@@ -1,3 +1,5 @@
+ jwt.secret=yourVeryLongSecretKeyWhichShouldBeAtLeast32CharactersLong12345
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/assetledger
