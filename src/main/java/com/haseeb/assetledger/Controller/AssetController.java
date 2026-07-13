@@ -2,46 +2,57 @@ package com.haseeb.assetledger.Controller;
 
 import com.haseeb.assetledger.Dto.AssetRequestDto;
 import com.haseeb.assetledger.Dto.AssetResponseDto;
-import com.haseeb.assetledger.Model.Asset;
 import com.haseeb.assetledger.Service.AssetService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/")
+@RequiredArgsConstructor
 public class AssetController {
 
-    public AssetService assetService;
+    private final AssetService assetService;
 
-    public AssetController(AssetService assetService) {
-        this.assetService = assetService;
-    }
-
-
-    @PostMapping("/{userid}/assets")
+    @PostMapping("/assets")
     public ResponseEntity<AssetResponseDto> addOrUpdateAsset(
-            @PathVariable Long userid,
+            Authentication authentication,
             @Valid @RequestBody AssetRequestDto request
-            ) {
-        return ResponseEntity.ok(assetService.addOrUpdateAsset(userid, request));
+    ) {
+
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                assetService.addOrUpdateAsset(email, request)
+        );
     }
 
-    @GetMapping("/{userid}/assets")
+    @GetMapping("/assets")
     public ResponseEntity<List<AssetResponseDto>> getUserAssets(
-            @PathVariable Long userid
+            Authentication authentication
     ) {
-        return ResponseEntity.ok(assetService.getUserAssets(userid));
+
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                assetService.getUserAssets(email)
+        );
     }
 
-    @GetMapping("/{userid}/networth")
+    @GetMapping("/networth")
     public ResponseEntity<BigDecimal> getNetworth(
-            @PathVariable Long userid
+            Authentication authentication
     ) {
-        BigDecimal networth = assetService.getNetworth(userid);
-        return ResponseEntity.ok(networth);
+
+        String email = authentication.getName();
+
+        return ResponseEntity.ok(
+                assetService.getNetworth(email)
+        );
     }
 }

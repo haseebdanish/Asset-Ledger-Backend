@@ -24,10 +24,10 @@ public class AssetService {
         this.userRepository = userRepository;
     }
 
-    public AssetResponseDto addOrUpdateAsset(Long userId, AssetRequestDto request) {
+    public AssetResponseDto addOrUpdateAsset(String email, AssetRequestDto request) {
 
         //1:Check if user exists
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         //2:Check if user Already has that same asset
@@ -73,16 +73,16 @@ public class AssetService {
         );
     }
 
-    public BigDecimal getNetworth(Long userId) {
-        User user = userRepository.findById(userId)
+    public BigDecimal getNetworth(String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return assetRepository.getTotalInvestedByUser(user);
     }
 
-    public List<AssetResponseDto> getUserAssets(Long userId) {
+    public List<AssetResponseDto> getUserAssets(String email) {
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return assetRepository.findByUser(user)

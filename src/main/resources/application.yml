@@ -1,4 +1,5 @@
- jwt.secret=yourVeryLongSecretKeyWhichShouldBeAtLeast32CharactersLong12345
+jwt:
+  secret: yourVeryLongSecretKeyWhichShouldBeAtLeast32CharactersLong12345
 
 spring:
   datasource:
