@@ -37,10 +37,11 @@ public class AssetController {
             Authentication authentication
     ) {
 
-        String email = authentication.getName();
+//        String email = authentication.getName();
+        System.out.println("Logged in user: " + authentication.getName());
 
         return ResponseEntity.ok(
-                assetService.getUserAssets(email)
+                assetService.getUserAssets(authentication.getName())
         );
     }
 
