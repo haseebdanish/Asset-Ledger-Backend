@@ -8,13 +8,16 @@ import java.math.BigDecimal;
 
 public record AssetRequestDto(
 
-        @NotBlank
+        @NotBlank(message = "Asset name is required")
         String assetName,
-        @NotBlank
+
+        @NotNull(message = "Asset type is required")
         AssetType assetType,
-        @NotNull
-        BigDecimal investedAmount,
-        @NotNull
-        BigDecimal quantity
+
+        @NotNull(message = "Quantity is required")
+        BigDecimal quantity,
+
+        @NotNull(message = "Invested amount is required")
+        BigDecimal investedAmount
 ) {
 }

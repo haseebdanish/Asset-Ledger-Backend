@@ -6,8 +6,10 @@ import com.haseeb.assetledger.Model.Asset;
 import com.haseeb.assetledger.Model.User;
 import com.haseeb.assetledger.Repository.AssetRepository;
 import com.haseeb.assetledger.Repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.beans.Transient;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,14 +18,15 @@ import java.util.List;
 public class AssetService {
 
 
-    private AssetRepository assetRepository;
-    private UserRepository userRepository;
+    private final AssetRepository assetRepository;
+    private final UserRepository userRepository;
 
     public AssetService(AssetRepository assetRepository, UserRepository userRepository) {
         this.assetRepository = assetRepository;
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public AssetResponseDto addOrUpdateAsset(String email, AssetRequestDto request) {
 
         //1:Check if user exists
@@ -77,25 +80,18 @@ public class AssetService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return assetRepository.getTotalInvestedByUser(user);
+        BigDecimal total = assetRepository.getTotalInvestedByUser(user);
+
+        return total != null ? total : BigDecimal.ZERO;
     }
 
     public List<AssetResponseDto> getUserAssets(String email) {
 
-//        User user = userRepository.findByEmail(email)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        System.out.println("User ID: " + user.getUserId());
-        System.out.println("Email: " + user.getEmail());
-
-        List<Asset> assets = assetRepository.findByUser(user);
-
-        System.out.println("Assets found: " + assets.size());
-
-        return assets.stream()
+        return assetRepository.findByUser(user)
+                .stream()
                 .map(asset -> new AssetResponseDto(
                         asset.getId(),
                         asset.getAssetName(),
@@ -104,17 +100,5 @@ public class AssetService {
                         asset.getInvestedAmount()
                 ))
                 .toList();
-
-//        return assetRepository.findByUser(user)
-//                .stream()
-//                .map(asset -> new AssetResponseDto(
-//                        asset.getId(),
-//                        asset.getAssetName(),
-//                        asset.getAssetType(),
-//                        asset.getQuantity(),
-//                        asset.getInvestedAmount()
-//                ))
-//                .toList();
     }
-
 }
