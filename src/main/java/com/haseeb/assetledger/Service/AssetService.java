@@ -82,11 +82,20 @@ public class AssetService {
 
     public List<AssetResponseDto> getUserAssets(String email) {
 
+//        User user = userRepository.findByEmail(email)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return assetRepository.findByUser(user)
-                .stream()
+        System.out.println("User ID: " + user.getUserId());
+        System.out.println("Email: " + user.getEmail());
+
+        List<Asset> assets = assetRepository.findByUser(user);
+
+        System.out.println("Assets found: " + assets.size());
+
+        return assets.stream()
                 .map(asset -> new AssetResponseDto(
                         asset.getId(),
                         asset.getAssetName(),
@@ -95,6 +104,17 @@ public class AssetService {
                         asset.getInvestedAmount()
                 ))
                 .toList();
+
+//        return assetRepository.findByUser(user)
+//                .stream()
+//                .map(asset -> new AssetResponseDto(
+//                        asset.getId(),
+//                        asset.getAssetName(),
+//                        asset.getAssetType(),
+//                        asset.getQuantity(),
+//                        asset.getInvestedAmount()
+//                ))
+//                .toList();
     }
 
 }
