@@ -2,6 +2,8 @@ package com.haseeb.assetledger.Service;
 
 import com.haseeb.assetledger.Dto.AssetRequestDto;
 import com.haseeb.assetledger.Dto.AssetResponseDto;
+import com.haseeb.assetledger.Exception.AssetNotFoundException;
+import com.haseeb.assetledger.Exception.UserNotFoundException;
 import com.haseeb.assetledger.Model.Asset;
 import com.haseeb.assetledger.Model.User;
 import com.haseeb.assetledger.Repository.AssetRepository;
@@ -28,7 +30,7 @@ public class AssetService {
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(email));
     }
 
     @Transactional
@@ -36,7 +38,7 @@ public class AssetService {
 
         //1:Check if user exists
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(email));
 
         //2:Check if user Already has that same asset
         Asset asset = assetRepository
@@ -83,7 +85,7 @@ public class AssetService {
 
     public BigDecimal getNetworth(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(email));
 
         BigDecimal total = assetRepository.getTotalInvestedByUser(user);
 
@@ -93,7 +95,7 @@ public class AssetService {
     public List<AssetResponseDto> getUserAssets(String email) {
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(email));
 
         return assetRepository.findByUser(user)
                 .stream()
@@ -112,7 +114,7 @@ public class AssetService {
         User user = getUserByEmail(email);
 
         Asset asset = assetRepository.findByIdAndUser(assetId, user)
-                .orElseThrow(() -> new RuntimeException("Asset not found"));
+                .orElseThrow(() -> new AssetNotFoundException(assetId));
 
         return new AssetResponseDto(
                 asset.getId(),
@@ -132,7 +134,7 @@ public class AssetService {
         User user = getUserByEmail(email);
 
         Asset asset = assetRepository.findByIdAndUser(assetId, user)
-                .orElseThrow(() -> new RuntimeException("Asset not found"));
+                .orElseThrow(() -> new AssetNotFoundException(assetId));
 
         asset.setAssetName(request.assetName());
         asset.setAssetType(request.assetType());
@@ -157,7 +159,7 @@ public class AssetService {
         User user = getUserByEmail(email);
 
         Asset asset = assetRepository.findByIdAndUser(assetId, user)
-                .orElseThrow(() -> new RuntimeException("Asset not found"));
+                .orElseThrow(() -> new AssetNotFoundException(assetId));
 
         assetRepository.delete(asset);
     }
