@@ -150,4 +150,16 @@ public class AssetService {
                 updated.getInvestedAmount()
         );
     }
+
+    @Transactional
+    public void deleteAsset(String email, Long assetId) {
+
+        User user = getUserByEmail(email);
+
+        Asset asset = assetRepository.findByIdAndUser(assetId, user)
+                .orElseThrow(() -> new RuntimeException("Asset not found"));
+
+        assetRepository.delete(asset);
+    }
+
 }

@@ -67,7 +67,7 @@ public class AssetController {
         );
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/assets/{id}")
     public ResponseEntity<AssetResponseDto> updateAsset(
             @PathVariable Long id,
             @RequestBody @Valid AssetRequestDto request,
@@ -76,6 +76,16 @@ public class AssetController {
         return ResponseEntity.ok(
                 assetService.updateAsset(authentication.getName(), id, request)
         );
+    }
+
+    @DeleteMapping("/assets/{id}")
+    public ResponseEntity<Void> deleteAsset(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        assetService.deleteAsset(authentication.getName(), id);
+
+        return ResponseEntity.noContent().build();
     }
 
 }
