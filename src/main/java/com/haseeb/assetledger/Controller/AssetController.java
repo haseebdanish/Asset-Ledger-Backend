@@ -56,4 +56,26 @@ public class AssetController {
                 assetService.getNetworth(email)
         );
     }
+
+    @GetMapping("/assets/{id}")
+    public ResponseEntity<AssetResponseDto> getAssetById(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                assetService.getAssetById(authentication.getName(), id)
+        );
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<AssetResponseDto> updateAsset(
+            @PathVariable Long id,
+            @RequestBody @Valid AssetRequestDto request,
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                assetService.updateAsset(authentication.getName(), id, request)
+        );
+    }
+
 }

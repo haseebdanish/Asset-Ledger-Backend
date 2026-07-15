@@ -22,4 +22,6 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
     @Query("SELECT COALESCE(SUM(a.investedAmount), 0) FROM Asset a WHERE a.user = :user")
     BigDecimal getTotalInvestedByUser(@Param("user") User user);
 
+    Optional<Asset> findByIdAndUser(Long id, User user);
+
 }

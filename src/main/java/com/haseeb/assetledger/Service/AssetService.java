@@ -26,6 +26,11 @@ public class AssetService {
         this.userRepository = userRepository;
     }
 
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
     @Transactional
     public AssetResponseDto addOrUpdateAsset(String email, AssetRequestDto request) {
 
@@ -100,5 +105,49 @@ public class AssetService {
                         asset.getInvestedAmount()
                 ))
                 .toList();
+    }
+
+    public AssetResponseDto getAssetById(String email, Long assetId) {
+
+        User user = getUserByEmail(email);
+
+        Asset asset = assetRepository.findByIdAndUser(assetId, user)
+                .orElseThrow(() -> new RuntimeException("Asset not found"));
+
+        return new AssetResponseDto(
+                asset.getId(),
+                asset.getAssetName(),
+                asset.getAssetType(),
+                asset.getQuantity(),
+                asset.getInvestedAmount()
+        );
+    }
+
+    @Transactional
+    public AssetResponseDto updateAsset(
+            String email,
+            Long assetId,
+            AssetRequestDto request) {
+
+        User user = getUserByEmail(email);
+
+        Asset asset = assetRepository.findByIdAndUser(assetId, user)
+                .orElseThrow(() -> new RuntimeException("Asset not found"));
+
+        asset.setAssetName(request.assetName());
+        asset.setAssetType(request.assetType());
+        asset.setQuantity(request.quantity());
+        asset.setInvestedAmount(request.investedAmount());
+        asset.setUpdatedAt(LocalDateTime.now());
+
+        Asset updated = assetRepository.save(asset);
+
+        return new AssetResponseDto(
+                updated.getId(),
+                updated.getAssetName(),
+                updated.getAssetType(),
+                updated.getQuantity(),
+                updated.getInvestedAmount()
+        );
     }
 }
