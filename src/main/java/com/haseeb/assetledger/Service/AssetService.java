@@ -2,6 +2,7 @@ package com.haseeb.assetledger.Service;
 
 import com.haseeb.assetledger.Dto.AssetRequestDto;
 import com.haseeb.assetledger.Dto.AssetResponseDto;
+import com.haseeb.assetledger.Dto.PortfolioAllocationDto;
 import com.haseeb.assetledger.Dto.PortfolioSummaryDto;
 import com.haseeb.assetledger.Exception.AssetNotFoundException;
 import com.haseeb.assetledger.Exception.UserNotFoundException;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.beans.Transient;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -189,6 +192,37 @@ public class AssetService {
                 assetRepository.getTotalInvestmentByType(user, AssetType.GOLD)
 
         );
+    }
+
+    public List<PortfolioAllocationDto> getAllocation(String email){
+
+        User user = getUserByEmail(email);
+
+        BigDecimal total = assetRepository.getTotalInvestedByUser(user);
+
+        return Arrays.stream(AssetType.values())
+                .map(type ->{
+
+                    BigDecimal amount =
+                            assetRepository.getTotalInvestmentByType(user,type);
+
+                    double percentage =
+                            total.compareTo(BigDecimal.ZERO)==0
+                                    ?0
+                                    :amount.multiply(BigDecimal.valueOf(100))
+                                    .divide(total,2, RoundingMode.HALF_UP)
+                                    .doubleValue();
+
+                    return new PortfolioAllocationDto(
+
+                            type.name(),
+
+                            amount,
+
+                            percentage
+                    );
+
+                }).toList();
     }
 
 }
