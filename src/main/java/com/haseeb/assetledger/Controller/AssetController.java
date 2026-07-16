@@ -7,6 +7,7 @@ import com.haseeb.assetledger.Dto.PortfolioSummaryDto;
 import com.haseeb.assetledger.Service.AssetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -107,5 +108,24 @@ public class AssetController {
                 assetService.getAllocation(authentication.getName())
         );
     }
- 
+
+    // Sample request to hit this endpoint: GET /assets/page?page=0&size=5
+    @GetMapping("/page")
+    public ResponseEntity<Page<AssetResponseDto>> getAssetsPaginated(
+
+            @RequestParam(defaultValue = "0") int page,
+
+            @RequestParam(defaultValue = "10") int size,
+
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                assetService.getUserAssets(
+                        authentication.getName(),
+                        page,
+                        size
+                )
+        );
+    }
+
 }

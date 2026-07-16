@@ -13,17 +13,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    @PostMapping("")
-    public ResponseEntity<UserResponseDto> createUser(
-            @Valid @RequestBody UserRequestDto request) {
-        return ResponseEntity.ok(userService.createUser(request));
-    }
 
     @GetMapping("/{userid}")
     public ResponseEntity<UserResponseDto> getUserById(

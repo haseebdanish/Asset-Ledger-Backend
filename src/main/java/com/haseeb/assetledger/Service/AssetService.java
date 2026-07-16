@@ -13,6 +13,9 @@ import com.haseeb.assetledger.Repository.AssetRepository;
 import com.haseeb.assetledger.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.beans.Transient;
 import java.math.BigDecimal;
@@ -223,6 +226,25 @@ public class AssetService {
                     );
 
                 }).toList();
+    }
+
+    public Page<AssetResponseDto> getUserAssets(
+            String email,
+            int page,
+            int size) {
+
+        User user = getUserByEmail(email);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return assetRepository.findByUser(user, pageable)
+                .map(asset -> new AssetResponseDto(
+                        asset.getId(),
+                        asset.getAssetName(),
+                        asset.getAssetType(),
+                        asset.getQuantity(),
+                        asset.getInvestedAmount()
+                ));
     }
 
 }
