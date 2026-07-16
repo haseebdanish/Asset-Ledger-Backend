@@ -1,86 +1,268 @@
-# 💰 AssetLedger – Net Worth Tracker (Backend)
+# AssetLedger – Secure Portfolio & Net Worth Tracker API
 
-A RESTful backend built with **Spring Boot + PostgreSQL** that allows users to manage financial assets and calculate net worth dynamically.
+A secure RESTful backend built with **Spring Boot** and **PostgreSQL** that allows users to manage financial assets, track investments, and calculate their portfolio's net worth.
 
-Designed using clean layered architecture with DTO separation and validation.
-
----
-
-## 🚀 Tech Stack
-
-- Java 25  
-- Spring Boot 4  
-- Spring Data JPA  
-- PostgreSQL  
-- Hibernate  
-- Jakarta Validation  
-- Maven  
+The application follows a clean layered architecture with DTO separation, JWT authentication, validation, exception handling, and interactive API documentation.
 
 ---
 
-## ✨ Features
+# 🚀 Tech Stack
 
-### 👤 User
-- Create user  
-- Fetch user by ID  
-- Input validation  
-- Password not returned in API responses  
-
-### 💼 Assets
-- Add or update asset (upsert logic)  
-- One row per asset per user  
-- Automatic quantity & invested amount aggregation  
-- List user assets  
-
-### 📊 Net Worth
-- Calculates total invested amount per user  
-- Uses database-level aggregation (`SUM()` query)  
+- Java 25
+- Spring Boot 4
+- Spring Security
+- JWT Authentication
+- Spring Data JPA
+- Hibernate
+- PostgreSQL
+- Jakarta Validation
+- Maven
+- Swagger / OpenAPI
 
 ---
 
-## 🔌 API Endpoints
+# ✨ Features
 
-### Create User
-POST `/users`
+## 🔐 Authentication
 
-### Get User
-GET `/users/{userId}`
-
-### Add or Update Asset
-POST `/users/{userId}/assets`
-
-### Get Assets
-GET `/users/{userId}/assets`
-
-### Get Net Worth
-GET `/users/{userId}/net-worth`
+- User Registration
+- User Login
+- JWT Token Generation
+- Secure Protected Endpoints
+- Stateless Authentication using Spring Security
 
 ---
 
-## 🧠 Key Backend Concepts Implemented
+## 💼 Asset Management
 
-- DTO pattern using Java records  
-- Validation (`@NotBlank`, `@Email`, `@Positive`)  
-- Upsert business logic  
-- Proper JPA relationships (`@ManyToOne`)  
-- Financial precision using `BigDecimal`  
-- Avoiding reserved SQL keywords  
-
----
-
-## 🛠️ Setup
-
-1. Create PostgreSQL database:
-   ```sql
-   CREATE DATABASE assetledger;
-2. Configure application.yml
-3. Run the application
-4. Test endpoints using Postman
+- Create Asset
+- Update Asset
+- Delete Asset
+- Get Asset by ID
+- List All Assets of Logged-in User
+- Automatic Upsert Logic
+    - Existing asset quantities are merged
+    - Invested amount is automatically updated
+- One asset record per user
 
 ---
 
-## 🔮 Future Improvements
-- Global exception handling
-- Authentication (JWT)
-- Real-time market price integration
-- React frontend dashboard
+## 📊 Portfolio Analytics
+
+- Calculate Total Net Worth
+- Portfolio Summary
+    - Total Investment
+    - Total Assets
+    - Investment by Asset Type
+- Portfolio Allocation
+    - Stocks
+    - Crypto
+    - Gold
+    - Mutual Funds
+
+---
+
+## 📄 Pagination
+
+- Paginated Asset Listing
+
+Example:
+
+```
+GET /assets/page?page=0&size=10
+```
+
+---
+
+## ✅ Validation
+
+- Request Validation
+- Custom Validation Messages
+- Financial values stored using `BigDecimal`
+
+---
+
+## ⚠️ Exception Handling
+
+- Global Exception Handler
+- Custom Exceptions
+    - UserNotFoundException
+    - AssetNotFoundException
+- Consistent Error Responses
+
+Example:
+
+```json
+{
+    "timestamp": "...",
+    "status": 404,
+    "error": "Not Found",
+    "message": "Asset not found with id: 10"
+}
+```
+
+---
+
+## 📖 API Documentation
+
+Interactive Swagger UI available at:
+
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
+---
+
+# 🔌 API Endpoints
+
+## Authentication
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| POST | `/auth/register` | Register User |
+| POST | `/auth/login` | Login User |
+
+---
+
+## Assets
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| POST | `/assets` | Create / Update Asset |
+| GET | `/assets` | Get All Assets |
+| GET | `/assets/{id}` | Get Asset by ID |
+| PUT | `/assets/{id}` | Update Asset |
+| DELETE | `/assets/{id}` | Delete Asset |
+
+---
+
+## Portfolio
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/assets/networth` | Total Net Worth |
+| GET | `/assets/summary` | Portfolio Summary |
+| GET | `/assets/allocation` | Portfolio Allocation |
+| GET | `/assets/page` | Paginated Assets |
+
+---
+
+# 🧠 Key Backend Concepts Implemented
+
+- Layered Architecture
+- DTO Pattern using Java Records
+- Spring Security
+- JWT Authentication
+- Role-based Request Protection
+- Stateless Authentication
+- RESTful API Design
+- Bean Validation
+- Global Exception Handling
+- Custom Exceptions
+- JPA Relationships
+- JPQL Aggregate Queries
+- Pagination
+- Financial Calculations using BigDecimal
+- Swagger/OpenAPI Documentation
+- Constructor-based Dependency Injection
+- Transaction Management (`@Transactional`)
+
+---
+
+# 🛠️ Setup
+
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/<your-username>/Asset-Ledger-Backend.git
+cd Asset-Ledger-Backend
+```
+
+---
+
+## 2. Create PostgreSQL Database
+
+```sql
+CREATE DATABASE assetledger;
+```
+
+---
+
+## 3. Configure Database
+
+Update your `application.yml`:
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/assetledger
+    username: your_username
+    password: your_password
+```
+
+---
+
+## 4. Run Application
+
+```bash
+mvn spring-boot:run
+```
+
+---
+
+## 5. Open Swagger
+
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
+---
+
+# 📂 Project Structure
+
+```
+src
+├── Config
+├── Controller
+├── DTO
+├── Exception
+├── Model
+├── Repository
+├── Security
+└── Service
+```
+
+---
+
+# 🔮 Future Improvements
+
+- Search Assets
+- Filter Assets by Type
+- Dynamic Sorting
+- Portfolio Performance Analytics
+- Current Market Price Integration
+- Profit/Loss Tracking
+- Transaction History
+- Docker Support
+- Unit & Integration Testing
+- CI/CD Pipeline (GitHub Actions)
+- React Frontend Dashboard
+- Cloud Deployment (Render/Railway + Vercel)
+
+---
+
+# 📸 API Preview
+
+Swagger UI
+
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
+---
+
+# 👨‍💻 Author
+
+**MD Haseebuddin**
+
+Developer | Java | Spring Boot | PostgreSQL
