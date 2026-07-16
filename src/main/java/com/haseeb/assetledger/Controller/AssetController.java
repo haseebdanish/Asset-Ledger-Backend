@@ -2,6 +2,7 @@ package com.haseeb.assetledger.Controller;
 
 import com.haseeb.assetledger.Dto.AssetRequestDto;
 import com.haseeb.assetledger.Dto.AssetResponseDto;
+import com.haseeb.assetledger.Dto.PortfolioSummaryDto;
 import com.haseeb.assetledger.Service.AssetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -88,4 +89,13 @@ public class AssetController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/summary")
+    public ResponseEntity<PortfolioSummaryDto> getSummary(
+            Authentication authentication){
+
+        return ResponseEntity.ok(
+                assetService.getPortfolioSummary(authentication.getName())
+        );
+    }
+ 
 }

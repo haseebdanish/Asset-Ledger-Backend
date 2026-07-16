@@ -2,9 +2,11 @@ package com.haseeb.assetledger.Service;
 
 import com.haseeb.assetledger.Dto.AssetRequestDto;
 import com.haseeb.assetledger.Dto.AssetResponseDto;
+import com.haseeb.assetledger.Dto.PortfolioSummaryDto;
 import com.haseeb.assetledger.Exception.AssetNotFoundException;
 import com.haseeb.assetledger.Exception.UserNotFoundException;
 import com.haseeb.assetledger.Model.Asset;
+import com.haseeb.assetledger.Model.AssetType;
 import com.haseeb.assetledger.Model.User;
 import com.haseeb.assetledger.Repository.AssetRepository;
 import com.haseeb.assetledger.Repository.UserRepository;
@@ -42,7 +44,11 @@ public class AssetService {
 
         //2:Check if user Already has that same asset
         Asset asset = assetRepository
-                .findByUserAndAssetName(user, request.assetName())
+                .findByUserAndAssetNameAndAssetType(
+                        user,
+                        request.assetName(),
+                        request.assetType()
+                )
                 .map(existingAsset -> {
                     //3: If exists update Value
                     existingAsset.setQuantity(
@@ -162,6 +168,27 @@ public class AssetService {
                 .orElseThrow(() -> new AssetNotFoundException(assetId));
 
         assetRepository.delete(asset);
+    }
+
+    public PortfolioSummaryDto getPortfolioSummary(String email){
+
+        User user = getUserByEmail(email);
+
+        return new PortfolioSummaryDto(
+
+                assetRepository.getTotalInvestedByUser(user),
+
+                assetRepository.countByUser(user),
+
+                assetRepository.getTotalInvestmentByType(user, AssetType.STOCK),
+
+                assetRepository.getTotalInvestmentByType(user, AssetType.MUTUAL_FUND),
+
+                assetRepository.getTotalInvestmentByType(user, AssetType.CRYPTO),
+
+                assetRepository.getTotalInvestmentByType(user, AssetType.GOLD)
+
+        );
     }
 
 }

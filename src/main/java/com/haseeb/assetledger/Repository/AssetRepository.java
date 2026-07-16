@@ -1,6 +1,7 @@
 package com.haseeb.assetledger.Repository;
 
 import com.haseeb.assetledger.Model.Asset;
+import com.haseeb.assetledger.Model.AssetType;
 import com.haseeb.assetledger.Model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,16 +13,40 @@ import java.util.Optional;
 
 public interface AssetRepository extends JpaRepository<Asset, Long> {
 
-    //Find asset by user and assetName
-    Optional<Asset> findByUserAndAssetName(User user, String assetName);
+    // Find asset by user and asset name
+    Optional<Asset> findByUserAndAssetNameAndAssetType(
+            User user,
+            String assetName,
+            AssetType assetType
+    );
 
-    //To List All Assets Of a User
+    // Find asset by ID and user (used for authorization)
+    Optional<Asset> findByIdAndUser(Long id, User user);
+
+    // List all assets of a user
     List<Asset> findByUser(User user);
 
-    //NetWorth
-    @Query("SELECT COALESCE(SUM(a.investedAmount), 0) FROM Asset a WHERE a.user = :user")
+    // Total invested amount (Net Worth)
+    @Query("""
+            SELECT COALESCE(SUM(a.investedAmount), 0)
+            FROM Asset a
+            WHERE a.user = :user
+            """)
     BigDecimal getTotalInvestedByUser(@Param("user") User user);
 
-    Optional<Asset> findByIdAndUser(Long id, User user);
+    // Total number of assets
+    Long countByUser(User user);
+
+    // Total investment by asset type
+    @Query("""
+            SELECT COALESCE(SUM(a.investedAmount), 0)
+            FROM Asset a
+            WHERE a.user = :user
+            AND a.assetType = :assetType
+            """)
+    BigDecimal getTotalInvestmentByType(
+            @Param("user") User user,
+            @Param("assetType") AssetType assetType
+    );
 
 }
