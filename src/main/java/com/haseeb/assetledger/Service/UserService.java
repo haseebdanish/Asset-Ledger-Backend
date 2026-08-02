@@ -23,6 +23,10 @@ public class UserService {
 
     public UserResponseDto createUser(UserRequestDto request) {
 
+        if (userRepository.existsByEmail(request.email())) {
+            throw new RuntimeException("Email already exists");
+        }
+
         User user = new User();
         user.setUserName(request.userName());
         user.setEmail(request.email());
