@@ -150,4 +150,18 @@ public class AssetController {
 
     }
 
+    @GetMapping("/assets/search")
+    public ResponseEntity<List<AssetResponseDto>> searchAssets(
+            @RequestParam String keyword,
+            Authentication authentication
+    ) {
+
+        return ResponseEntity.ok(
+                assetService.searchAssets(
+                        authentication.getName(),
+                        keyword
+                )
+        );
+    }
+
 }

@@ -54,4 +54,9 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
     Page<Asset> findByUser(User user, Pageable pageable);
 
     List<Asset> findByUserAndAssetType(User user, AssetType assetType);
+
+    List<Asset> findByUserAndAssetNameContainingIgnoreCase(
+            User user,
+            String keyword
+    );
 }

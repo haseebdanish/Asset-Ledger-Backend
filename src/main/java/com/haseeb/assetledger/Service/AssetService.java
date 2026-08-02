@@ -272,4 +272,23 @@ public class AssetService {
                 .toList();
     }
 
+    public List<AssetResponseDto> searchAssets(
+            String email,
+            String keyword) {
+
+        User user = getUserByEmail(email);
+
+        return assetRepository
+                .findByUserAndAssetNameContainingIgnoreCase(user, keyword)
+                .stream()
+                .map(asset -> new AssetResponseDto(
+                        asset.getId(),
+                        asset.getAssetName(),
+                        asset.getAssetType(),
+                        asset.getQuantity(),
+                        asset.getInvestedAmount()
+                ))
+                .toList();
+    }
+
 }
