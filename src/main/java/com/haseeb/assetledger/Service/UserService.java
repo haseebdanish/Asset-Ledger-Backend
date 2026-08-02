@@ -3,6 +3,7 @@ package com.haseeb.assetledger.Service;
 
 import com.haseeb.assetledger.Dto.UserRequestDto;
 import com.haseeb.assetledger.Dto.UserResponseDto;
+import com.haseeb.assetledger.Exception.UserNotFoundException;
 import com.haseeb.assetledger.Model.User;
 import com.haseeb.assetledger.Repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,6 +49,18 @@ public class UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return new UserResponseDto(
+                user.getUserId(),
+                user.getUserName(),
+                user.getEmail()
+        );
+    }
+
+    public UserResponseDto getCurrentUser(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(email));
 
         return new UserResponseDto(
                 user.getUserId(),

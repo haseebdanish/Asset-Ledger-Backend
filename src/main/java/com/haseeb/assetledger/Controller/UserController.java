@@ -7,6 +7,7 @@ import com.haseeb.assetledger.Model.User;
 import com.haseeb.assetledger.Service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,11 +21,13 @@ public class UserController {
     }
 
 
-    @GetMapping("/{userid}")
-    public ResponseEntity<UserResponseDto> getUserById(
-            @PathVariable Long userid
-    ) {
-        return ResponseEntity.ok(userService.getUserById(userid));
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDto> getCurrentUser(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                userService.getCurrentUser(authentication.getName())
+        );
     }
 }
 

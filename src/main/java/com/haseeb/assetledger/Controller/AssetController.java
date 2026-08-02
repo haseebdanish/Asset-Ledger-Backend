@@ -4,6 +4,7 @@ import com.haseeb.assetledger.Dto.AssetRequestDto;
 import com.haseeb.assetledger.Dto.AssetResponseDto;
 import com.haseeb.assetledger.Dto.PortfolioAllocationDto;
 import com.haseeb.assetledger.Dto.PortfolioSummaryDto;
+import com.haseeb.assetledger.Model.AssetType;
 import com.haseeb.assetledger.Service.AssetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -126,6 +127,27 @@ public class AssetController {
                         size
                 )
         );
+    }
+
+    @GetMapping("/assets/type/{assetType}")
+    public ResponseEntity<List<AssetResponseDto>> getAssetsByType(
+
+            @PathVariable AssetType assetType,
+
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+
+                assetService.getAssetsByType(
+
+                        authentication.getName(),
+
+                        assetType
+
+                )
+
+        );
+
     }
 
 }

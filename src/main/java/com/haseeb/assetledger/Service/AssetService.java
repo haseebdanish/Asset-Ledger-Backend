@@ -247,4 +247,29 @@ public class AssetService {
                 ));
     }
 
+    public List<AssetResponseDto> getAssetsByType(
+            String email,
+            AssetType assetType) {
+
+        User user = getUserByEmail(email);
+
+        return assetRepository
+                .findByUserAndAssetType(user, assetType)
+                .stream()
+                .map(asset -> new AssetResponseDto(
+
+                        asset.getId(),
+
+                        asset.getAssetName(),
+
+                        asset.getAssetType(),
+
+                        asset.getQuantity(),
+
+                        asset.getInvestedAmount()
+
+                ))
+                .toList();
+    }
+
 }
