@@ -1,9 +1,6 @@
 package com.haseeb.assetledger.Controller;
 
-import com.haseeb.assetledger.Dto.AssetRequestDto;
-import com.haseeb.assetledger.Dto.AssetResponseDto;
-import com.haseeb.assetledger.Dto.PortfolioAllocationDto;
-import com.haseeb.assetledger.Dto.PortfolioSummaryDto;
+import com.haseeb.assetledger.Dto.*;
 import com.haseeb.assetledger.Model.AssetType;
 import com.haseeb.assetledger.Service.AssetService;
 import jakarta.validation.Valid;
@@ -17,13 +14,13 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/assets")
 @RequiredArgsConstructor
 public class AssetController {
 
     private final AssetService assetService;
 
-    @PostMapping("/assets")
+    @PostMapping("/")
     public ResponseEntity<AssetResponseDto> addOrUpdateAsset(
             Authentication authentication,
             @Valid @RequestBody AssetRequestDto request
@@ -36,7 +33,7 @@ public class AssetController {
         );
     }
 
-    @GetMapping("/assets")
+    @GetMapping("/")
     public ResponseEntity<List<AssetResponseDto>> getUserAssets(
             Authentication authentication
     ) {
@@ -61,7 +58,7 @@ public class AssetController {
         );
     }
 
-    @GetMapping("/assets/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<AssetResponseDto> getAssetById(
             @PathVariable Long id,
             Authentication authentication) {
@@ -71,7 +68,7 @@ public class AssetController {
         );
     }
 
-    @PutMapping("/assets/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<AssetResponseDto> updateAsset(
             @PathVariable Long id,
             @RequestBody @Valid AssetRequestDto request,
@@ -82,7 +79,7 @@ public class AssetController {
         );
     }
 
-    @DeleteMapping("/assets/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAsset(
             @PathVariable Long id,
             Authentication authentication) {
@@ -129,7 +126,7 @@ public class AssetController {
         );
     }
 
-    @GetMapping("/assets/type/{assetType}")
+    @GetMapping("/type/{assetType}")
     public ResponseEntity<List<AssetResponseDto>> getAssetsByType(
 
             @PathVariable AssetType assetType,
@@ -150,7 +147,7 @@ public class AssetController {
 
     }
 
-    @GetMapping("/assets/search")
+    @GetMapping("/search")
     public ResponseEntity<List<AssetResponseDto>> searchAssets(
             @RequestParam String keyword,
             Authentication authentication
@@ -161,6 +158,15 @@ public class AssetController {
                         authentication.getName(),
                         keyword
                 )
+        );
+    }
+
+    @GetMapping("/analytics")
+    public ResponseEntity<PortfolioAnalyticsDto> getAnalytics(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                assetService.getAnalytics(authentication.getName())
         );
     }
 

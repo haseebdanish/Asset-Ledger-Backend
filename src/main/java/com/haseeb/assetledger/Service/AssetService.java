@@ -1,9 +1,6 @@
 package com.haseeb.assetledger.Service;
 
-import com.haseeb.assetledger.Dto.AssetRequestDto;
-import com.haseeb.assetledger.Dto.AssetResponseDto;
-import com.haseeb.assetledger.Dto.PortfolioAllocationDto;
-import com.haseeb.assetledger.Dto.PortfolioSummaryDto;
+import com.haseeb.assetledger.Dto.*;
 import com.haseeb.assetledger.Exception.AssetNotFoundException;
 import com.haseeb.assetledger.Exception.UserNotFoundException;
 import com.haseeb.assetledger.Model.Asset;
@@ -22,6 +19,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -289,6 +287,39 @@ public class AssetService {
                         asset.getInvestedAmount()
                 ))
                 .toList();
+    }
+
+    public PortfolioAnalyticsDto getAnalytics(String email) {
+
+        User user = getUserByEmail(email);
+
+        List<Asset> assets = assetRepository.findByUser(user);
+
+        Asset largest = assets.stream()
+                .max(Comparator.comparing(Asset::getInvestedAmount))
+                .orElse(null);
+
+        Asset smallest = assets.stream()
+                .min(Comparator.comparing(Asset::getInvestedAmount))
+                .orElse(null);
+
+        return new PortfolioAnalyticsDto(
+
+                assetRepository.getTotalInvestedByUser(user),
+
+                assetRepository.countByUser(user),
+
+                assetRepository.getAverageInvestment(user),
+
+                largest != null ? largest.getAssetName() : null,
+
+                largest != null ? largest.getInvestedAmount() : BigDecimal.ZERO,
+
+                smallest != null ? smallest.getAssetName() : null,
+
+                smallest != null ? smallest.getInvestedAmount() : BigDecimal.ZERO
+
+        );
     }
 
 }

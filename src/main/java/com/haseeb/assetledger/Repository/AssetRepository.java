@@ -59,4 +59,13 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
             User user,
             String keyword
     );
+
+    @Query("""
+SELECT COALESCE(AVG(a.investedAmount),0)
+FROM Asset a
+WHERE a.user = :user
+""")
+    BigDecimal getAverageInvestment(
+            @Param("user") User user
+    );
 }
