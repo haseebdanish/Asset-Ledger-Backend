@@ -19,6 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 public class SecurityConfig {
@@ -40,7 +41,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .cors(cors -> {})
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authenticationProvider(authenticationProvider())
 
@@ -49,12 +50,19 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users", "/auth/**", "/test/**",        "/v3/api-docs/**",
+
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        .requestMatchers(
+                                "/auth/**",
+                                "/users/**",
+                                "/test/**",
+                                "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated()
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        .anyRequest().authenticated()
                 )
 
                 .addFilterBefore(
@@ -91,7 +99,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:5173")
+                List.of("http://localhost:5174")
         );
 
         configuration.setAllowedMethods(
