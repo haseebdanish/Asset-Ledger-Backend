@@ -98,8 +98,8 @@ public class SecurityConfig {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(
-                List.of("http://localhost:5174")
+        configuration.setAllowedOriginPatterns(
+                List.of("http://localhost:*")
         );
 
         configuration.setAllowedMethods(
