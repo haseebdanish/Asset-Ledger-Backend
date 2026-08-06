@@ -20,7 +20,7 @@ public class AssetController {
 
     private final AssetService assetService;
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<AssetResponseDto> addOrUpdateAsset(
             Authentication authentication,
             @Valid @RequestBody AssetRequestDto request
@@ -33,14 +33,11 @@ public class AssetController {
         );
     }
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<AssetResponseDto>> getUserAssets(
             Authentication authentication
     ) {
-
-//        String email = authentication.getName();
-        System.out.println("Logged in user: " + authentication.getName());
-
+        
         return ResponseEntity.ok(
                 assetService.getUserAssets(authentication.getName())
         );
