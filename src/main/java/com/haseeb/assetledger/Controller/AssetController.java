@@ -37,7 +37,7 @@ public class AssetController {
     public ResponseEntity<List<AssetResponseDto>> getUserAssets(
             Authentication authentication
     ) {
-        
+
         return ResponseEntity.ok(
                 assetService.getUserAssets(authentication.getName())
         );

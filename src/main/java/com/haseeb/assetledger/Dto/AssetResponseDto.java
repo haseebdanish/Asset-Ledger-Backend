@@ -9,7 +9,7 @@ public record AssetResponseDto(
         Long id,
         String assetName,
         AssetType assetType,
-        BigDecimal investedAmount,
-        BigDecimal quantity
+        BigDecimal quantity,
+        BigDecimal investedAmount
 ) {
 }
