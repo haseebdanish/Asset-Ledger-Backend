@@ -1,71 +1,129 @@
 package com.haseeb.assetledger.Exception;
 
 import com.haseeb.assetledger.Dto.ErrorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex){
+    private static final Logger log =
+            LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-        ErrorResponse response = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(
+            UserNotFoundException ex) {
+
+        return buildResponse(
+                HttpStatus.NOT_FOUND,
                 ex.getMessage()
         );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(AssetNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleAssetNotFound(AssetNotFoundException ex){
+    public ResponseEntity<ErrorResponse> handleAssetNotFound(
+            AssetNotFoundException ex) {
 
-        ErrorResponse response = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                HttpStatus.NOT_FOUND.getReasonPhrase(),
+        return buildResponse(
+                HttpStatus.NOT_FOUND,
                 ex.getMessage()
         );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception ex){
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleEmailAlreadyExists(
+            EmailAlreadyExistsException ex) {
 
-        ErrorResponse response = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+        return buildResponse(
+                HttpStatus.CONFLICT,
                 ex.getMessage()
         );
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationErrors(
+    public ResponseEntity<ErrorResponse> handleValidationErrors(
             MethodArgumentNotValidException ex) {
 
-        Map<String, String> errors = new HashMap<>();
-
-        ex.getBindingResult()
+        String message = ex.getBindingResult()
                 .getFieldErrors()
-                .forEach(error ->
-                        errors.put(error.getField(), error.getDefaultMessage()));
+                .stream()
+                .map(error ->
+                        error.getField() + ": " + error.getDefaultMessage())
+                .distinct()
+                .collect(Collectors.joining("; "));
 
-        return ResponseEntity.badRequest().body(errors);
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                message.isBlank() ? "Validation failed" : message
+        );
     }
 
-}
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRequestBody(
+            HttpMessageNotReadableException ex) {
 
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                "Request body is missing or contains invalid JSON"
+        );
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(
+            HttpRequestMethodNotSupportedException ex) {
+
+        return buildResponse(
+                HttpStatus.METHOD_NOT_ALLOWED,
+                "HTTP method not supported for this endpoint"
+        );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex) {
+
+        log.warn("Database constraint violation", ex);
+
+        return buildResponse(
+                HttpStatus.CONFLICT,
+                "The request conflicts with existing data"
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnexpectedException(
+            Exception ex) {
+
+        log.error("Unexpected application error", ex);
+
+        return buildResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "An unexpected error occurred. Please try again later."
+        );
+    }
+
+    private ResponseEntity<ErrorResponse> buildResponse(
+            HttpStatus status,
+            String message) {
+
+        ErrorResponse response = new ErrorResponse(
+                LocalDateTime.now(),
+                status.value(),
+                status.getReasonPhrase(),
+                message
+        );
+
+        return ResponseEntity.status(status).body(response);
+    }
+}
