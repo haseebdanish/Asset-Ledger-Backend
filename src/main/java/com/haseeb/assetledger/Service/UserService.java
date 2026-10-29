@@ -3,6 +3,7 @@ package com.haseeb.assetledger.Service;
 
 import com.haseeb.assetledger.Dto.UserRequestDto;
 import com.haseeb.assetledger.Dto.UserResponseDto;
+import com.haseeb.assetledger.Exception.EmailAlreadyExistsException;
 import com.haseeb.assetledger.Exception.UserNotFoundException;
 import com.haseeb.assetledger.Model.User;
 import com.haseeb.assetledger.Repository.UserRepository;
@@ -25,15 +26,13 @@ public class UserService {
     public UserResponseDto createUser(UserRequestDto request) {
 
         if (userRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("Email already exists");
+            throw new EmailAlreadyExistsException(request.email());
         }
 
         User user = new User();
         user.setUserName(request.userName());
         user.setEmail(request.email());
-        user.setPassword(
-                passwordEncoder.encode(request.password())
-        );
+        user.setPassword(passwordEncoder.encode(request.password()));
         user.setCreatedAt(LocalDateTime.now());
 
         User saved = userRepository.save(user);
