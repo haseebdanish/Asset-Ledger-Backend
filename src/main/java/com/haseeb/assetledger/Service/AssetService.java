@@ -174,57 +174,61 @@ public class AssetService {
         assetRepository.delete(asset);
     }
 
-    public PortfolioSummaryDto getPortfolioSummary(String email){
+    public PortfolioSummaryDto getPortfolioSummary(String email) {
 
         User user = getUserByEmail(email);
 
         return new PortfolioSummaryDto(
-
-                assetRepository.getTotalInvestedByUser(user),
-
+                safeAmount(assetRepository.getTotalInvestedByUser(user)),
                 assetRepository.countByUser(user),
 
-                assetRepository.getTotalInvestmentByType(user, AssetType.STOCK),
-
-                assetRepository.getTotalInvestmentByType(user, AssetType.MUTUAL_FUND),
-
-                assetRepository.getTotalInvestmentByType(user, AssetType.CRYPTO),
-
-                assetRepository.getTotalInvestmentByType(user, AssetType.GOLD)
-
+                safeAmount(assetRepository.getTotalInvestmentByType(user, AssetType.STOCK)),
+                safeAmount(assetRepository.getTotalInvestmentByType(user, AssetType.MUTUAL_FUND)),
+                safeAmount(assetRepository.getTotalInvestmentByType(user, AssetType.CRYPTO)),
+                safeAmount(assetRepository.getTotalInvestmentByType(user, AssetType.GOLD)),
+                safeAmount(assetRepository.getTotalInvestmentByType(user, AssetType.BANK)),
+                safeAmount(assetRepository.getTotalInvestmentByType(user, AssetType.REAL_ESTATE))
         );
     }
 
-    public List<PortfolioAllocationDto> getAllocation(String email){
+    private BigDecimal safeAmount(BigDecimal amount) {
+        return amount != null ? amount : BigDecimal.ZERO;
+    }
+
+
+    public List<PortfolioAllocationDto> getAllocation(String email) {
 
         User user = getUserByEmail(email);
 
-        BigDecimal total = assetRepository.getTotalInvestedByUser(user);
+        BigDecimal total = safeAmount(
+                assetRepository.getTotalInvestedByUser(user)
+        );
 
         return Arrays.stream(AssetType.values())
-                .map(type ->{
+                .map(type -> {
 
-                    BigDecimal amount =
-                            assetRepository.getTotalInvestmentByType(user,type);
-
-                    double percentage =
-                            total.compareTo(BigDecimal.ZERO)==0
-                                    ?0
-                                    :amount.multiply(BigDecimal.valueOf(100))
-                                    .divide(total,2, RoundingMode.HALF_UP)
-                                    .doubleValue();
-
-                    return new PortfolioAllocationDto(
-
-                            type.name(),
-
-                            amount,
-
-                            percentage
+                    BigDecimal amount = safeAmount(
+                            assetRepository.getTotalInvestmentByType(user, type)
                     );
 
-                }).toList();
+                    double percentage = 0.0;
+
+                    if (total.compareTo(BigDecimal.ZERO) > 0) {
+                        percentage = amount
+                                .multiply(BigDecimal.valueOf(100))
+                                .divide(total, 2, RoundingMode.HALF_UP)
+                                .doubleValue();
+                    }
+
+                    return new PortfolioAllocationDto(
+                            type.name(),
+                            amount,
+                            percentage
+                    );
+                })
+                .toList();
     }
+
 
     public Page<AssetResponseDto> getUserAssets(
             String email,
@@ -289,6 +293,7 @@ public class AssetService {
                 .toList();
     }
 
+
     public PortfolioAnalyticsDto getAnalytics(String email) {
 
         User user = getUserByEmail(email);
@@ -303,23 +308,24 @@ public class AssetService {
                 .min(Comparator.comparing(Asset::getInvestedAmount))
                 .orElse(null);
 
+        BigDecimal totalInvestment = safeAmount(
+                assetRepository.getTotalInvestedByUser(user)
+        );
+
+        BigDecimal averageInvestment = safeAmount(
+                assetRepository.getAverageInvestment(user)
+        );
+
         return new PortfolioAnalyticsDto(
-
-                assetRepository.getTotalInvestedByUser(user),
-
+                totalInvestment,
                 assetRepository.countByUser(user),
-
-                assetRepository.getAverageInvestment(user),
-
+                averageInvestment,
                 largest != null ? largest.getAssetName() : null,
-
                 largest != null ? largest.getInvestedAmount() : BigDecimal.ZERO,
-
                 smallest != null ? smallest.getAssetName() : null,
-
                 smallest != null ? smallest.getInvestedAmount() : BigDecimal.ZERO
-
         );
     }
+
 
 }
