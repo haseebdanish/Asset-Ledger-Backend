@@ -12,17 +12,28 @@ import java.util.Collections;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(
+        name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_users_email",
+                        columnNames = "email"
+                )
+        }
+)
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+    @Column(nullable = false)
     @NotBlank
     private String userName;
+    @Column(nullable = false, length = 254)
     @Email
     @NotBlank
     private String email;
+    @Column(nullable = false)
     @NotBlank
     private String password;
     private LocalDateTime createdAt;

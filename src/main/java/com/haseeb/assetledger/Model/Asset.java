@@ -2,35 +2,53 @@ package com.haseeb.assetledger.Model;
 
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(
+        indexes = {
+                @Index(
+                        name = "idx_asset_user_type",
+                        columnList = "user_id, asset_type"
+                ),
+                @Index(
+                        name = "idx_asset_user_name_type",
+                        columnList = "user_id, asset_name, asset_type"
+                )
+        }
+)
 public class Asset {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotBlank
     private String assetName;
+
+    @NotNull
     @Enumerated(EnumType.STRING)
     private AssetType assetType;
+
+    @Column(nullable = false, precision = 19, scale = 2)
     @NotNull
-    @Positive
+    @PositiveOrZero
     private BigDecimal investedAmount;
+
+    @Column(nullable = false, precision = 30, scale = 12)
     @NotNull
     @Positive
     private BigDecimal quantity;
+
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     public Asset() {

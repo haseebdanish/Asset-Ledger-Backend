@@ -4,10 +4,13 @@ import com.haseeb.assetledger.Dto.*;
 import com.haseeb.assetledger.Model.AssetType;
 import com.haseeb.assetledger.Service.AssetService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -16,6 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/assets")
 @RequiredArgsConstructor
+@Validated
 public class AssetController {
 
     private final AssetService assetService;
@@ -108,9 +112,12 @@ public class AssetController {
     @GetMapping("/page")
     public ResponseEntity<Page<AssetResponseDto>> getAssetsPaginated(
 
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = "Page must be zero or greater")
+            int page,
 
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "10") @Min(value = 1, message = "Page size must be at least 1")
+            @Max(value = 100, message = "Page size cannot exceed 100")
+            int size,
 
             Authentication authentication) {
 
