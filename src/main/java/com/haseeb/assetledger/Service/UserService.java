@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 @Service
 public class UserService {
@@ -25,13 +26,17 @@ public class UserService {
 
     public UserResponseDto createUser(UserRequestDto request) {
 
-        if (userRepository.existsByEmail(request.email())) {
-            throw new EmailAlreadyExistsException(request.email());
+        String normalizedEmail = request.email()
+                .trim()
+                .toLowerCase(Locale.ROOT);
+
+        if (userRepository.existsByEmail(normalizedEmail)) {
+            throw new EmailAlreadyExistsException(normalizedEmail);
         }
 
         User user = new User();
-        user.setUserName(request.userName());
-        user.setEmail(request.email());
+        user.setUserName(request.userName().trim());
+        user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setCreatedAt(LocalDateTime.now());
 

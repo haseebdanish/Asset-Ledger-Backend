@@ -1,16 +1,20 @@
 jwt:
-  secret: yourVeryLongSecretKeyWhichShouldBeAtLeast32CharactersLong12345
+  secret: ${JWT_SECRET}
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/assetledger
-    username: danish
-    password:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/assetledger}
+    username: ${DB_USERNAME:danish}
+    password: ${DB_PASSWORD:}
 
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
+
+logging:
+  level:
+    org.hibernate.SQL: INFO
