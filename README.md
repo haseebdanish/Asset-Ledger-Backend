@@ -1,268 +1,305 @@
-# AssetLedger – Secure Portfolio & Net Worth Tracker API
 
-A secure RESTful backend built with **Spring Boot** and **PostgreSQL** that allows users to manage financial assets, track investments, and calculate their portfolio's net worth.
+# 💰 AssetLedger – Backend
 
-The application follows a clean layered architecture with DTO separation, JWT authentication, validation, exception handling, and interactive API documentation.
+A RESTful backend for AssetLedger, a personal finance and net-worth tracking application.
 
----
+Built using Java and Spring Boot, the backend provides secure user authentication, asset management, portfolio analytics, and user-specific data access through REST APIs.
 
-# 🚀 Tech Stack
+## 🚀 Live API
 
-- Java 25
-- Spring Boot 4
-- Spring Security
-- JWT Authentication
-- Spring Data JPA
-- Hibernate
-- PostgreSQL
-- Jakarta Validation
+- **Backend API:** https://asset-ledger-backend.onrender.com
+- **Swagger Documentation:** https://asset-ledger-backend.onrender.com/swagger-ui/index.html
+- **Frontend:** https://asset-ledger-front-end.vercel.app
+
+## ✨ Features
+
+### 🔐 Authentication & Security
+- User registration and login.
+- JWT-based authentication.
+- Password hashing using BCrypt.
+- Stateless authentication using Spring Security.
+- Protected endpoints.
+- User-specific data access and ownership validation.
+- Prevention of unauthorized access to other users' assets.
+
+### 📊 Asset Management
+- Create, retrieve, update, and delete assets.
+- Automatic asset aggregation when an existing asset is added again.
+- Asset ownership validation.
+- Support for multiple asset categories.
+
+### 📈 Portfolio Analytics
+- Total invested amount.
+- Net-worth calculation based on invested amounts.
+- Asset allocation by category.
+- Largest and smallest holdings.
+- Average holding value.
+- Total number of holdings.
+
+### 🔎 Search, Filtering & Pagination
+- Search assets by keyword.
+- Filter assets by asset type.
+- Paginated asset retrieval.
+
+### 🛡️ Validation & Error Handling
+- Request validation using Jakarta Validation.
+- Centralized exception handling.
+- Meaningful HTTP status codes and error responses.
+- Validation for asset names, quantities, and invested amounts.
+
+## 🛠️ Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| Java 21 | Programming language |
+| Spring Boot 3.5.4 | Backend framework |
+| Spring Security | Authentication and authorization |
+| Spring Data JPA | Database access |
+| Hibernate | ORM |
+| PostgreSQL | Relational database |
+| JWT (JJWT 0.12.7) | Token-based authentication |
+| Maven | Build and dependency management |
+| Docker | Containerization |
+| Neon | Managed PostgreSQL hosting |
+| Render | Backend deployment |
+| Swagger / OpenAPI | API documentation |
+
+## 🏗️ Project Structure
+
+```text
+src
+└── main
+    ├── java
+    │   └── com.haseeb.assetledger
+    │       ├── Config
+    │       ├── Controller
+    │       ├── DTO
+    │       ├── Entity
+    │       ├── Exception
+    │       ├── Repository
+    │       ├── Security
+    │       └── Service
+    │
+    └── resources
+        └── application.yml
+```
+
+## 📡 API Endpoints
+
+All endpoints except registration and login require JWT authentication.
+
+### 🔐 Authentication
+
+| Method | Endpoint | Description | Authentication |
+|---|---|---|---|
+| POST | `/auth/register` | Register a new user | Not required |
+| POST | `/auth/login` | Authenticate a user and generate JWT | Not required |
+
+### 👤 User
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/users/me` | Retrieve the authenticated user's profile |
+
+### 💼 Asset Management
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/assets` | Add a new asset or update an existing holding |
+| GET | `/assets` | Retrieve all assets belonging to the authenticated user |
+| GET | `/assets/{id}` | Retrieve a specific asset |
+| PUT | `/assets/{id}` | Update an existing asset |
+| DELETE | `/assets/{id}` | Delete an asset |
+
+### 🔎 Asset Search & Filtering
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/assets/search?keyword={keyword}` | Search assets by keyword |
+| GET | `/assets/type/{assetType}` | Filter assets by type |
+| GET | `/assets/page` | Retrieve paginated assets |
+
+### 📈 Portfolio & Analytics
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/assets/summary` | Retrieve portfolio summary |
+| GET | `/assets/allocation` | Retrieve asset allocation |
+| GET | `/assets/analytics` | Retrieve portfolio analytics |
+| GET | `/assets/networth` | Calculate total net worth based on invested amounts |
+
+## 🪙 Supported Asset Types
+
+- `STOCK`
+- `CRYPTO`
+- `GOLD`
+- `MUTUAL_FUND`
+- `BANK`
+- `REAL_ESTATE`
+
+## 🔑 Authentication Flow
+
+AssetLedger uses JWT-based authentication.
+
+1. A user registers through `/auth/register`.
+2. The user logs in through `/auth/login`.
+3. The backend validates the credentials.
+4. A JWT token is generated and returned.
+5. The frontend stores the token and includes it in subsequent authenticated requests.
+6. Spring Security validates the token before allowing access to protected endpoints.
+
+Authenticated requests must include:
+
+```http
+Authorization: Bearer <JWT_TOKEN>
+```
+
+The backend uses a stateless security configuration, meaning authentication is performed using the JWT supplied with each request.
+
+## 🗄️ Database Design
+
+The application uses PostgreSQL with Spring Data JPA and Hibernate.
+
+Each asset is associated with a specific user.
+
+Asset records contain:
+
+- `id`
+- `assetName`
+- `assetType`
+- `investedAmount`
+- `quantity`
+- `createdAt`
+- `updatedAt`
+- `user`
+
+When a user adds an asset with the same name and type as an existing holding, the backend aggregates the quantity and invested amount instead of creating a duplicate record.
+
+All asset operations are scoped to the authenticated user to ensure data isolation.
+
+## ⚙️ Getting Started
+
+### 📋 Prerequisites
+
+- Java 21
 - Maven
-- Swagger / OpenAPI
+- PostgreSQL
+- Git
 
----
-
-# ✨ Features
-
-## 🔐 Authentication
-
-- User Registration
-- User Login
-- JWT Token Generation
-- Secure Protected Endpoints
-- Stateless Authentication using Spring Security
-
----
-
-## 💼 Asset Management
-
-- Create Asset
-- Update Asset
-- Delete Asset
-- Get Asset by ID
-- List All Assets of Logged-in User
-- Automatic Upsert Logic
-    - Existing asset quantities are merged
-    - Invested amount is automatically updated
-- One asset record per user
-
----
-
-## 📊 Portfolio Analytics
-
-- Calculate Total Net Worth
-- Portfolio Summary
-    - Total Investment
-    - Total Assets
-    - Investment by Asset Type
-- Portfolio Allocation
-    - Stocks
-    - Crypto
-    - Gold
-    - Mutual Funds
-
----
-
-## 📄 Pagination
-
-- Paginated Asset Listing
-
-Example:
-
-```
-GET /assets/page?page=0&size=10
-```
-
----
-
-## ✅ Validation
-
-- Request Validation
-- Custom Validation Messages
-- Financial values stored using `BigDecimal`
-
----
-
-## ⚠️ Exception Handling
-
-- Global Exception Handler
-- Custom Exceptions
-    - UserNotFoundException
-    - AssetNotFoundException
-- Consistent Error Responses
-
-Example:
-
-```json
-{
-    "timestamp": "...",
-    "status": 404,
-    "error": "Not Found",
-    "message": "Asset not found with id: 10"
-}
-```
-
----
-
-## 📖 API Documentation
-
-Interactive Swagger UI available at:
-
-```
-http://localhost:8080/swagger-ui/index.html
-```
-
----
-
-# 🔌 API Endpoints
-
-## Authentication
-
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/auth/register` | Register User |
-| POST | `/auth/login` | Login User |
-
----
-
-## Assets
-
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| POST | `/assets` | Create / Update Asset |
-| GET | `/assets` | Get All Assets |
-| GET | `/assets/{id}` | Get Asset by ID |
-| PUT | `/assets/{id}` | Update Asset |
-| DELETE | `/assets/{id}` | Delete Asset |
-
----
-
-## Portfolio
-
-| Method | Endpoint | Description |
-|---------|----------|-------------|
-| GET | `/assets/networth` | Total Net Worth |
-| GET | `/assets/summary` | Portfolio Summary |
-| GET | `/assets/allocation` | Portfolio Allocation |
-| GET | `/assets/page` | Paginated Assets |
-
----
-
-# 🧠 Key Backend Concepts Implemented
-
-- Layered Architecture
-- DTO Pattern using Java Records
-- Spring Security
-- JWT Authentication
-- Role-based Request Protection
-- Stateless Authentication
-- RESTful API Design
-- Bean Validation
-- Global Exception Handling
-- Custom Exceptions
-- JPA Relationships
-- JPQL Aggregate Queries
-- Pagination
-- Financial Calculations using BigDecimal
-- Swagger/OpenAPI Documentation
-- Constructor-based Dependency Injection
-- Transaction Management (`@Transactional`)
-
----
-
-# 🛠️ Setup
-
-## 1. Clone Repository
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/Asset-Ledger-Backend.git
+git clone https://github.com/haseebdanish/Asset-Ledger-Backend.git
+```
+
+### 2. Navigate to the project directory
+
+```bash
 cd Asset-Ledger-Backend
 ```
 
----
+### 3. Configure environment variables
 
-## 2. Create PostgreSQL Database
+Configure the following environment variables before running the application:
 
-```sql
-CREATE DATABASE assetledger;
-```
+| Variable | Description |
+|---|---|
+| `DB_URL` | PostgreSQL JDBC connection URL |
+| `DB_USERNAME` | Database username |
+| `DB_PASSWORD` | Database password |
+| `JWT_SECRET` | Secret key used for JWT signing |
+| `PORT` | Application port (defaults to 8080 locally) |
 
----
+Do not commit database credentials or JWT secrets to version control.
 
-## 3. Configure Database
+### 4. Run the application
 
-Update your `application.yml`:
-
-```yaml
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/assetledger
-    username: your_username
-    password: your_password
-```
-
----
-
-## 4. Run Application
+Using Maven:
 
 ```bash
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
 
----
+Alternatively, build the application:
 
-## 5. Open Swagger
-
-```
-http://localhost:8080/swagger-ui/index.html
+```bash
+./mvnw clean package
 ```
 
----
+The backend will be available at:
 
-# 📂 Project Structure
+http://localhost:8080
 
-```
-src
-├── Config
-├── Controller
-├── DTO
-├── Exception
-├── Model
-├── Repository
-├── Security
-└── Service
+## 🐳 Docker
+
+The application includes a Dockerfile for containerized deployment.
+
+Build the Docker image:
+
+```bash
+docker build -t asset-ledger-backend .
 ```
 
----
+Run the container:
 
-# 🔮 Future Improvements
-
-- Search Assets
-- Filter Assets by Type
-- Dynamic Sorting
-- Portfolio Performance Analytics
-- Current Market Price Integration
-- Profit/Loss Tracking
-- Transaction History
-- Docker Support
-- Unit & Integration Testing
-- CI/CD Pipeline (GitHub Actions)
-- React Frontend Dashboard
-- Cloud Deployment (Render/Railway + Vercel)
-
----
-
-# 📸 API Preview
-
-Swagger UI
-
-```
-http://localhost:8080/swagger-ui/index.html
+```bash
+docker run -p 8080:8080 \
+  -e DB_URL=<DATABASE_URL> \
+  -e DB_USERNAME=<DATABASE_USERNAME> \
+  -e DB_PASSWORD=<DATABASE_PASSWORD> \
+  -e JWT_SECRET=<JWT_SECRET> \
+  asset-ledger-backend
 ```
 
----
+Replace the placeholder values with your own configuration.
 
-# 👨‍💻 Author
+## ☁️ Deployment Architecture
 
-**MD Haseebuddin**
+The production application uses the following architecture:
 
-Developer | Java | Spring Boot | PostgreSQL
+```text
+React Frontend
+     |
+     | HTTPS / REST API
+     v
+Spring Boot Backend
+     |
+     | JPA / Hibernate
+     v
+PostgreSQL Database
+```
+
+| Component | Hosting |
+|---|---|
+| Frontend | Vercel |
+| Backend | Render |
+| Database | Neon PostgreSQL |
+| Containerization | Docker |
+
+## 📖 API Documentation
+
+Swagger UI is available at:
+
+https://asset-ledger-backend.onrender.com/swagger-ui/index.html
+
+Use it to explore the available endpoints and test API requests.
+
+## ⚠️ Current Limitations
+
+- Net worth is currently calculated using invested amounts rather than live market valuations.
+- Live market price integration is not yet implemented.
+- Historical portfolio performance tracking is planned for a future release.
+
+## 🔮 Future Improvements
+
+- Live stock, cryptocurrency, gold, and mutual fund price integration.
+- Portfolio performance tracking.
+- Historical net-worth tracking.
+- Automated testing and improved test coverage.
+- Additional financial analytics.
+
+## 👨‍💻 Author
+
+**Haseeb Danish**
+
+GitHub: https://github.com/haseebdanish
