@@ -110,13 +110,17 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(
-                List.of("http://localhost:*")
+        configuration.setAllowedOrigins(
+                List.of(
+                        "http://localhost:5173",
+                        "https://asset-ledger-front-end.vercel.app"
+                )
         );
 
         configuration.setAllowedMethods(
@@ -128,10 +132,7 @@ public class SecurityConfig {
                         "OPTIONS"
                 )
         );
-
-        configuration.setAllowedHeaders(
-                List.of("*")
-        );
+        configuration.setAllowedHeaders(List.of("*"));
 
         configuration.setAllowCredentials(true);
 
@@ -142,4 +143,5 @@ public class SecurityConfig {
 
         return source;
     }
+
 }
